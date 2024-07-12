@@ -1,189 +1,106 @@
-Claro, aqui está a atualização do README para incluir a existência do `Dockerfile` e do `docker-compose.yml`.
+# TACOAPI - API para Gerenciamento de Alimentos
 
-# Alimento API
+## Descrição
 
-Esta aplicação é uma API RESTful construída com Flask para gerenciar informações nutricionais de alimentos. A API permite adicionar, listar e buscar alimentos em um banco de dados. A aplicação utiliza SQLAlchemy para interação com o banco de dados.
+TACOAPI é uma API desenvolvida para gerenciar dados de alimentos, permitindo adicionar, buscar e manipular informações nutricionais. A API utiliza Flask para o backend, SQLAlchemy para ORM e MySQL como banco de dados. Toda a aplicação é containerizada usando Docker e Docker Compose.
+
+## Tecnologias Utilizadas
+
+- **Flask**: Framework de micro serviços para construção de APIs em Python.
+- **SQLAlchemy**: ORM para interação com o banco de dados.
+- **MySQL**: Banco de dados relacional.
+- **Docker**: Para containerização da aplicação.
+- **Docker Compose**: Para orquestração dos containers.
+- **Pandas**: Biblioteca de manipulação de dados para Python.
 
 ## Estrutura do Projeto
 
-- `app.py`: Contém as rotas e lógica principal da API.
-- `models/alimento.py`: Define o modelo Alimento.
-- `database.py`: Configura a conexão com o banco de dados.
-- `Dockerfile`: Define a imagem Docker para a aplicação.
-- `docker-compose.yml`: Define os serviços Docker para a aplicação.
-- `README.md`: Documentação do projeto.
-
-## Requisitos
-
-- Python 3.x
-- Flask
-- SQLAlchemy
-- Docker (opcional)
-- Docker Compose (opcional)
+- `app.py`: Arquivo principal da aplicação Flask.
+- `config.py`: Configurações da aplicação.
+- `database.py`: Configuração do banco de dados e inicialização do SQLAlchemy.
+- `models`: Contém os modelos do SQLAlchemy.
+- `routes`: Contém as rotas da API.
+- `Dockerfile`: Arquivo para construir a imagem Docker da aplicação.
+- `Dockerfile.script`: Arquivo para construir a imagem Docker do script de importação.
+- `docker-compose.yml`: Arquivo de configuração do Docker Compose.
+- `requirements.txt`: Arquivo com as dependências do projeto.
+- `script_taco.py`: Script para importar dados do CSV para o banco de dados.
+- `wait-for-it.sh`: Script para garantir que o MySQL esteja disponível antes de iniciar a aplicação Flask.
+- `taco-db-nutrientes.csv`: Arquivo CSV com os dados dos alimentos.
 
 ## Instalação
 
-### Manualmente
+### Pré-requisitos
+
+- Docker e Docker Compose instalados na sua máquina.
+
+### Passos para Configuração
 
 1. Clone o repositório:
 
-```bash
-git clone https://github.com/usuario/alimento-api.git
-cd alimento-api
-```
+    ```bash
+    git clone https://github.com/eunandocosta/tacoapi.git
+    cd tacoapi
+    ```
 
-2. Crie e ative um ambiente virtual:
+2. Configure as variáveis de ambiente no arquivo `docker-compose.yml` se necessário.
 
-```bash
-python -m venv venv
-source venv/bin/activate  # No Windows, use `venv\Scripts\activate`
-```
+3. Inicie os containers Docker:
 
-3. Instale as dependências:
+    ```bash
+    docker-compose up --build
+    ```
 
-```bash
-pip install -r requirements.txt
-```
+4. A aplicação estará disponível em `http://localhost:5000`.
 
-4. Configure o banco de dados em `database.py`:
+## Endpoints
 
-```python
-DATABASE_URL = "sqlite:///./test.db"  # Exemplo de banco de dados SQLite
-```
-
-5. Crie o banco de dados:
-
-```bash
-python
->>> from database import Base, engine
->>> Base.metadata.create_all(bind=engine)
->>> exit()
-```
-
-### Usando Docker
-
-1. Clone o repositório:
-
-```bash
-git clone https://github.com/usuario/alimento-api.git
-cd alimento-api
-```
-
-2. Construa e inicie os containers Docker:
-
-```bash
-docker-compose up --build
-```
-
-A API estará disponível em `http://127.0.0.1:5000`.
-
-## Uso
-
-### Iniciar o Servidor
-
-Inicie o servidor Flask:
-
-```bash
-flask run
-```
-
-A API estará disponível em `http://127.0.0.1:5000`.
-
-### Endpoints
-
-#### Adicionar Alimento
-
-Adiciona um novo alimento ao banco de dados.
+### Adicionar Alimento
 
 - **URL**: `/add_alimento`
 - **Método**: `POST`
-- **Corpo da Requisição**: JSON
+- **Descrição**: Adiciona um novo alimento.
+- **Corpo da Requisição**:
+    ```json
+    {
+        "id": 1,
+        "Nome": "Banana",
+        "Umidade": 74.91,
+        "Energia_kcal": 89,
+        "Energia_kj": 372,
+        "Proteina": 1.09,
+        "Lipideos": 0.33,
+        "Colesterol": 0,
+        "Carboidrato": 22.84,
+        "Fibra_Alimentar": 2.6,
+        "Cinzas": 0.82,
+        "Calcio": 5,
+        "Magnesio": 27
+    }
+    ```
 
-```json
-{
-  "id": 1,
-  "Nome": "Maçã",
-  "Umidade": 85.6,
-  "Energia_kcal": 52,
-  "Energia_kj": 218,
-  "Proteina": 0.26,
-  "Lipideos": 0.17,
-  "Colesterol": 0,
-  "Carboidrato": 13.81,
-  "Fibra_Alimentar": 2.4,
-  "Cinzas": 0.19,
-  "Calcio": 6,
-  "Magnesio": 5
-}
-```
-
-- **Resposta de Sucesso**: `201 Created`
-- **Resposta de Erro**: `409 Conflict` se o alimento já existe.
-
-#### Listar Alimentos
-
-Retorna uma lista de todos os alimentos no banco de dados.
+### Buscar Alimentos
 
 - **URL**: `/alimentos`
 - **Método**: `GET`
-- **Resposta de Sucesso**: `200 OK`
+- **Descrição**: Retorna uma lista de todos os alimentos.
 
-#### Buscar Alimentos
-
-Busca alimentos pelo nome.
+### Buscar Alimentos por Nome
 
 - **URL**: `/search_alimentos`
 - **Método**: `GET`
-- **Parâmetro de Consulta**: `query` (string)
+- **Descrição**: Busca alimentos pelo nome.
+- **Parâmetros**:
+    - `query`: Nome ou parte do nome do alimento a ser buscado.
 
-- **Exemplo**:
+## Contribuição
 
-  `GET /search_alimentos?query=Maçã`
+1. Faça um fork do repositório.
+2. Crie uma nova branch com sua feature (`git checkout -b feature/nova-feature`).
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`).
+4. Push para a branch (`git push origin feature/nova-feature`).
+5. Abra um Pull Request.
 
-- **Resposta de Sucesso**: `200 OK`
+## Licença
 
-## Modelo de Dados
-
-O modelo de dados `Alimento` é definido em `models/alimento.py` e possui os seguintes campos:
-
-- `id` (Integer): Identificador único do alimento.
-- `Nome` (String): Nome do alimento.
-- `Umidade` (Float): Percentual de umidade do alimento.
-- `Energia_kcal` (Float): Energia em quilocalorias.
-- `Energia_kj` (Float): Energia em quilojoules.
-- `Proteina` (Float): Quantidade de proteína em gramas.
-- `Lipideos` (Float): Quantidade de lipídeos em gramas.
-- `Colesterol` (Float): Quantidade de colesterol em miligramas.
-- `Carboidrato` (Float): Quantidade de carboidratos em gramas.
-- `Fibra_Alimentar` (Float): Quantidade de fibra alimentar em gramas.
-- `Cinzas` (Float): Quantidade de cinzas em gramas.
-- `Calcio` (Float): Quantidade de cálcio em miligramas.
-- `Magnesio` (Float): Quantidade de magnésio em miligramas.
-
-## Logging
-
-A aplicação utiliza o módulo `logging` para registrar informações sobre as operações executadas, como adição de alimentos e erros.
-
-## Tratamento de Erros
-
-A aplicação trata erros de integridade (como duplicação de ID) e retorna mensagens de erro apropriadas ao cliente.
-
-## Docker
-
-A aplicação inclui suporte para Docker, permitindo fácil configuração e implantação.
-
-### Dockerfile
-
-O `Dockerfile` define a imagem Docker para a aplicação.
-
-### docker-compose.yml
-
-O `docker-compose.yml` define os serviços Docker para a aplicação, facilitando a execução em ambientes de desenvolvimento e produção.
-
-### Contribuições
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests.
-
-### Licença
-
-Este projeto está licenciado sob a MIT License. Veja o arquivo `LICENSE` para mais detalhes.
+Este projeto está licenciado sob a MIT License - veja o arquivo LICENSE para mais detalhes.
